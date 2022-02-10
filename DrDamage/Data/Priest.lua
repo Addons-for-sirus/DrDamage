@@ -209,7 +209,7 @@ function DrDamage:PlayerData()
 		--Glyph of Power Word: Shield -- (1 + 0.05 * IPWS + 0.01 * Twin Disciplines) * (1 + 0.01 * Blessed Resilience) * (1 + 0.02 * Focused Power). NOTE: Spiritual Healing doesn't apply.
 		if self:HasGlyph(55672) then
 			--TODO: 4T10 A/M?
-			local glyphMod = (1 + (Talents["Improved Power Word: Shield"] or 0) + (Talents["Twin Disciplines"] or 0) + (self:GetSetAmount( "Tier 10 - Healing" ) >= 4 and 0.05 or 0)) * (1 + (Talents["Blessed Resilience"] or 0)) * (1 + (Talents["Focused Power"] or 0))
+			local glyphMod = (1 + (Talents["Improved Power Word: Shield"] or 0) + (Talents["Twin Disciplines"] or 0) + ((self:GetSetAmount("Tier 5 - Healing") >= 2 and 0.16 or 0)) or ((self:GetSetAmount( "Tier 10 - Healing" ) >= 4 and 0.05 or 0))) * (1 + (Talents["Blessed Resilience"] or 0)) * (1 + (Talents["Focused Power"] or 0))
 			calculation.extraCrit = (0.2 / pwsMod) * auraMod * glyphMod
 			calculation.extraCanCrit = true
 			calculation.extraName = glyph
@@ -258,6 +258,7 @@ function DrDamage:PlayerData()
 		end
 	end
 --SETS
+	self.SetBonuses["Tier 5 - Healing"] = { 151638, 151636, 151635, 151639, 151637, 103444, 103442, 103441, 103445, 103443,30153,30151,30150,30154,30152 }
 	self.SetBonuses["Tier 7 - Damage"] = { 40454, 40456, 40457, 40458, 40459, 39521, 39523, 39528, 39529, 39530 }
 	self.SetBonuses["Tier 7 - Healing"] = { 40445, 40447, 40448, 40449, 40450, 39514, 39515, 39517, 39518, 39519 }
 	self.SetBonuses["Tier 8 - Damage"] = { 46163, 46165, 46168, 46170, 46172, 45391, 45392, 45393, 45394, 45395 }
@@ -402,6 +403,7 @@ function DrDamage:PlayerData()
 					[12] = { 1265, 1265, 20, 20, spellLevel = 70, Downrank = 4 },
 					[13] = { 1920, 1920, 30, 30, spellLevel = 75, },
 					[14] = { 2230, 2230, 0, 0, spellLevel = 80, },
+					[15] = { 2230, 2230, 0, 0, spellLevel = 80, },
 		},
 		[GetSpellInfo(2054)] = {
 					--BASE OK, INCREASE OK, COEFFICIENT X
