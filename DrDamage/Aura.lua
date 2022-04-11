@@ -49,6 +49,9 @@ local function DrD_LoadAuras()
 		--Heroic Presence
 		Aura[GetSpellInfo(28878)] = { Value = 1, ModType = "hitPerc", ID = 28878 }
 	end
+	----eredar 5%
+	Aura[GetSpellInfo(316466)] = { School = "All", ID = 316466,  Multiply = true, Mods = { ["dmgM"] = 0.05 } }
+	Aura[GetSpellInfo(316463)] = { School = "All", ID = 316463,  Multiply = true, Mods = { ["dmgM"] = 0.02 } }
 	--Ferocious Inspiration
 	Aura[GetSpellInfo(34455)] = { Category = "+3% damage", Not = { "Absorb", "Utility", "Pet" }, Manual = GetSpellInfo(34455), ID = 34455, Multiply = true, Mods = { ["dmgM"] = 0.03 } }
 	--Arcane Empowerment
