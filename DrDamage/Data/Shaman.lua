@@ -271,7 +271,7 @@ function DrDamage:PlayerData()
 		--Glyph of Lava (additive - 3.3.3)
 		local bonusR2 = (ActiveAuras["T5x2R"] and math_min(30, ActiveAuras["T5x2R"] + 1) or 0) * 0.05
 		local bonusR4 = (ActiveAuras["T5x4R"] and math_min(30, ActiveAuras["T5x4R"] + 1) or 0) * 0.02
-		local bonusM = (ActiveAuras["T5x2M"] and math_min(2, ActiveAuras["T5x2R"] + 1) or 0) * 0.5
+		local bonusM = (ActiveAuras["T5x2M"] and math_min(2, ActiveAuras["T5x2M"] + 1) or 0) * 0.5
 		-- print(bonus)
 		if self:HasGlyph(55454) then
 			calculation.spellDmgM = calculation.spellDmgM + 0.1
