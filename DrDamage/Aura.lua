@@ -183,7 +183,7 @@ local function DrD_LoadAuras()
 
 --Target
 	Aura = DrDamage.TargetAura
-	
+
 --Buffs
 	--Icebound Fortitude (TODO: How to implement this reduction properly?)
 	Aura[GetSpellInfo(48792)] = { Value = -0.3, NoManual = true }
@@ -345,6 +345,8 @@ local function DrD_LoadAuras()
 		Aura[GetSpellInfo(33876)] = Aura[GetSpellInfo(33878)]
 		--Stampede
 		Aura[GetSpellInfo(57393)] = { School = "Physical", Melee = true, Value = 0.25, ModType = "bleedBonus", Category = "+30% bleed", NoManual = true }
+
+		-- Aura[GetSpellInfo(307999)] = { School = "Nature", Caster = true, Apps = 30, Value = 0.05, NoManual = true } -- TODO
 	--Special
 		--Armor Disruption
 		Aura[GetSpellInfo(36482)] = { School = "Physical", Melee = true, Value = 0.05, Apps = 5, NoManual = true }
@@ -368,6 +370,7 @@ local function DrD_LoadAuras()
 		Aura[GetSpellInfo(56626)] = Aura[GetSpellInfo(770)]
 		--Curse of Weakness
 		Aura[GetSpellInfo(702)] = Aura[GetSpellInfo(770)]
+
 	--NPC
 		--Holyform
 		Aura[GetSpellInfo(46565)] = { School = "Physical", Melee = true, Value = -0.2, NoManual = true }

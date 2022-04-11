@@ -263,8 +263,9 @@ function DrDamage:CasterCalc( name, rank, tooltip, modify, debug )
 	calculation.spellHit = 0
 	calculation.meleeCrit = 0
 	calculation.meleeHit = 0
-	calculation.freeCrit = 0												--Mana crit modifier		
-
+	calculation.freeCrit = 0												--Mana crit modifier	
+	--dop proc dmg
+	calculation.dopProcsDmg = 0
 	--CORE: Spell damage and coefficients
 	calculation.spellDmg = healingSpell and GetSpellBonusHealing() or baseSpell.Double and math_max(GetSpellBonusDamage(baseSpell.Double[1]),GetSpellBonusDamage(baseSpell.Double[2])) or GetSpellBonusDamage(schoolTable[calculation.school] or 1)
 	calculation.spellDmg_dd = 0
@@ -654,8 +655,8 @@ DrD_DmgCalc = function( baseSpell, spell, nextCalc, hitCalc, tooltip )
 	local dispSpellDmgM = calculation.spellDmgM * modHits
 
 	--CORE: Basic min/max calculation
-	local calcMinDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.minDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
-	local calcMaxDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.maxDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
+	local calcMinDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.minDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod + calculation.dopProcsDmg --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
+	local calcMaxDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.maxDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod + (calculation.dopProcsDmg* calculation.spellCrit ) --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
 	local calcDotDmg = 0
 
 	--CORE: Effects extended by talents. (Imp. SW:P etc.)

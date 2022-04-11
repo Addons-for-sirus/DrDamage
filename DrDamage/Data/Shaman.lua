@@ -46,7 +46,7 @@ function DrDamage:PlayerData()
 					local bonus = rank and select(rank, 116, 160, 220, 348, 456, 652) or 652
 					local chance = (self:HasGlyph(55439) and 0.25 or 0.2) + (UnitHealth("target") ~= 0 and ((UnitHealth("target") / UnitHealthMax("target")) <= 0.35) and Talents["Blessing of the Eternals"] or 0)
 					chance = math_min(1, chance * (calculation.spellName == "Chain Heal" and calculation.aoe or 1))
-					calculation.extra = bonus 
+					calculation.extra = bonus
 					calculation.extraDamage = 0.455 * 1.88 * (12/15)
 					calculation.extraBonus = true
 					calculation.extraDmgM = 1 + (Talents["Purification"] or 0)
@@ -59,7 +59,7 @@ function DrDamage:PlayerData()
 					local bonus = rank and select(rank, 116, 160, 220, 348, 456, 652) or 652
 					local chance = (self:HasGlyph(55439) and 0.25 or 0.2) + (UnitHealth("target") ~= 0 and ((UnitHealth("target") / UnitHealthMax("target")) <= 0.35) and Talents["Blessing of the Eternals"] or 0)
 					chance = math_min(1, chance * (calculation.spellName == "Chain Heal" and calculation.aoe or 1))
-					calculation.extra = bonus 
+					calculation.extra = bonus
 					calculation.extraDamage = 0.455 * 1.88 * (12/15)
 					calculation.extraBonus = true
 					calculation.extraDmgM = 1 + (Talents["Purification"] or 0)
@@ -83,7 +83,7 @@ function DrDamage:PlayerData()
 	self.Calculation["Weapon Mastery"] = function( calculation, talentValue )
 		calculation.dmgM = calculation.dmgM * (1 + talentValue)
 		calculation.wDmgM = calculation.wDmgM * (1 + talentValue)
-	end	
+	end
 --ABILITIES
 	local wf = GetSpellInfo(8232)
 	local wficon = "|T" .. select(3,GetSpellInfo(8232)) .. ":16:16:1:-1|t"
@@ -128,8 +128,8 @@ function DrDamage:PlayerData()
 				calculation.extraChance = spellHit
 				calculation.E_canCrit = true
 				calculation.E_critM = critM
-				calculation.E_dmgM = calculation.dmgM_Magic			
-				calculation.E_spellDmg = GetSpellBonusDamage(3)			
+				calculation.E_dmgM = calculation.dmgM_Magic
+				calculation.E_spellDmg = GetSpellBonusDamage(3)
 				calculation.E_critPerc = GetSpellCritChance(3) + calculation.spellCrit
 			elseif string_find(fb, name) then
 				local spd = self:GetWeaponSpeed()
@@ -145,8 +145,8 @@ function DrDamage:PlayerData()
 				calculation.extraChance = (spd * 9)/60 * spellHit
 				calculation.E_canCrit = true
 				calculation.E_critM = critM
-				calculation.E_dmgM = calculation.dmgM_Magic					
-				calculation.E_spellDmg = GetSpellBonusDamage(5)			
+				calculation.E_dmgM = calculation.dmgM_Magic
+				calculation.E_spellDmg = GetSpellBonusDamage(5)
 				calculation.E_critPerc = GetSpellCritChance(5) + calculation.spellCrit
 			end
 		end
@@ -252,6 +252,13 @@ function DrDamage:PlayerData()
 		if self:GetSetAmount( "T8 Melee" ) >= 2 then
 			calculation.dmgM_Add = calculation.dmgM_Add + 0.2
 		end
+		if self:GetSetAmount( "T5 Melee" ) >= 2 then
+			-- local base, posBuff, negBuff = UnitAttackPower("player")
+			-- calculation.dmgBonus = (calculation.dmgBonus or 0) + (((base+ posBuff+ negBuff)*1.25))
+			calculation.APBonus = (calculation.APBonus or 0) + 1.25
+			-- calculation.APBonus = calculation.APBonus + calculation.APBonus* 1.225
+			-- /run  local base, posBuff, negBuff = UnitAttackPower("player") print(((base+ posBuff+ negBuff)*1.25))
+		end
 	end
 	self.Calculation["Earth Shield"] = function( calculation )
 		--Glyph of Earth Shield (multiplicative - 3.3.3)
@@ -259,13 +266,27 @@ function DrDamage:PlayerData()
 			calculation.dmgM = calculation.dmgM * 1.2
 		end
 	end
+
 	self.Calculation["Lava Burst"] = function( calculation, ActiveAuras )
 		--Glyph of Lava (additive - 3.3.3)
+		local bonusR2 = (ActiveAuras["T5x2R"] and math_min(30, ActiveAuras["T5x2R"] + 1) or 0) * 0.05
+		local bonusR4 = (ActiveAuras["T5x4R"] and math_min(30, ActiveAuras["T5x4R"] + 1) or 0) * 0.02
+		local bonusM = (ActiveAuras["T5x2M"] and math_min(2, ActiveAuras["T5x2R"] + 1) or 0) * 0.5
+		-- print(bonus)
 		if self:HasGlyph(55454) then
 			calculation.spellDmgM = calculation.spellDmgM + 0.1
 		end
 		if ActiveAuras["Flame Shock"] then
 			calculation.critPerc = 100
+		end
+		if ActiveAuras["T5x2M"] then
+			calculation.dmgM = calculation.dmgM + bonusM
+		end
+		if ActiveAuras["T5x2R"] then
+			calculation.dmgM = calculation.dmgM + bonusR2
+		end
+		if ActiveAuras["T5x4R"] then
+			calculation.dmgM = calculation.dmgM + bonusR4
 		end
 		if self:GetSetAmount( "T7 Elemental" ) >= 4 then
 			calculation.critM = calculation.critM + 0.05
@@ -339,7 +360,25 @@ function DrDamage:PlayerData()
 			calculation.dmgM_Add = calculation.dmgM_Add + 0.25
 		end
 	end
-	self.Calculation["Earth Shock"] = self.Calculation["Frost Shock"]
+	-- self.Calculation["Earth Shock"] = self.Calculation["Frost Shock"]
+	self.Calculation["Earth Shock"] = function( calculation ,ActiveAuras )
+		local spellDmg = GetSpellBonusDamage(4) * 2.2 --- todo 2.2 is coof of spd to stone spike
+		local bonusR2 = (ActiveAuras["T5x2R"] and ((math_min(10, ActiveAuras["T5x2R"] + 1) or 1)/2) * (spellDmg or 0))
+		local bunusR2TD  = (ActiveAuras["T5x2RTD"] and ((math_min(5, ActiveAuras["T5x2RTD"] + 1) or 1)* 0.2)) or 0
+		-- print(bonusR2)
+		-- local bonusR2N = (ActiveAuras["T5x2RN"] and (math_min(5, ActiveAuras["T5x2RN"] + 1) or 1)/2) * 0.2
+		if ActiveAuras["T5x2R"] then
+			calculation.dopProcsDmg = (calculation.dopProcsDmg or 0) + (bonusR2 + ((bunusR2TD and bonusR2 * bunusR2TD) or 0))  ----------- thants +- dmg
+		end
+
+		if self:HasGlyph(55442) then
+			calculation.castTime = 1
+		end
+		if self:GetSetAmount( "T9 Melee" ) >= 4 then
+			calculation.dmgM_Add = calculation.dmgM_Add + 0.25
+
+		end
+	end
 	self.Calculation["Healing Stream Totem"] = function( calculation )
 		--Glyph of Healing Stream Totem (additive with restorative totems - 3.3.3)
 		if self:HasGlyph(55456) then
@@ -420,6 +459,8 @@ function DrDamage:PlayerData()
 	self.SetBonuses["T9 Healer"] = { 48280, 48281, 48282, 48283, 48284, 48295, 48296, 48297, 48298, 48299, 48301, 48302, 48303, 48304, 48300, 48306, 48307, 48308, 48309, 48305, 48286, 48287, 48288, 48289, 48285, 48293, 48292, 48291, 48290, 48294 }
 	self.SetBonuses["T10 Elemental"] = { 50842, 50841, 50843, 50844, 50845, 51238, 51201, 51239, 51200, 51237, 51202, 51236, 51203, 51235, 51204 }
 	self.SetBonuses["T10 Healer"] = { 50836, 50837, 50838, 50839, 50835, 51248, 51191, 51247, 51192, 51246, 51193, 51245, 51194, 51249, 51190 }
+	self.SetBonuses["T5 Melee"] = { 30189, 30192, 30190, 30194, 30185 } --TODO
+	self.SetBonuses["T5 Elemental"] = { 30170, 30172, 30171, 30173, 30169 } --TODO
 --RELIC
 	--Steamcaller's Totem, Totem of Healing Rains, Totem of the Bay
 	self.RelicSlot["Chain Heal"] = { 45114, 243, 28523, 87, 38368, 102, ModType1 = "Base", ModType2 = "Base", ModType3 = "Base" }
@@ -436,11 +477,11 @@ function DrDamage:PlayerData()
 	--Totem of Hex (unaffected by Shamanism), Totem of the Void, Totem of the Storm, Totem of Ancestral Guidance
 	self.RelicSlot["Lightning Bolt"] = { 40267, 165, 28248, 55, 23199, 33, 32330, 85, ModType1 = "BaseSP" }
 	self.RelicSlot["Chain Lightning"] = { 40267, 165, 28248, 55, 23199, 33, 32330, 85, ModType1 = "BaseSP" }
-	self.RelicSlot["Lesser Healing Wave"] = { 
+	self.RelicSlot["Lesser Healing Wave"] = {
 		--Savage, Hateful, Deadly, Furious, Relentless, Wrathful
 		42595, 204, 42596, 236, 42597, 267, 42598, 320, 42599, 404, 51501, 459,
-		--Totem of the Plains, Totem of Life, Totem of Sustaining	
-		25645, 79, 22396, 80, 23200, 53, 
+		--Totem of the Plains, Totem of Life, Totem of Sustaining
+		25645, 79, 22396, 80, 23200, 53,
 		ModTypeAll = "BaseSP",
 	}
 	--Totem of the Dancing Flame
@@ -457,9 +498,19 @@ function DrDamage:PlayerData()
 	self.PlayerAura[GetSpellInfo(55166)] = { Spells = { 331, 8004, 1064 }, Apps = 3, Value = 20, ModType = "critPerc", NoManual = true }
 	--Clearcasting
 	self.PlayerAura[GetSpellInfo(16246)] = { School = "Spells", ActiveAura = "Clearcasting", ID = 16246, Mods = { ["manaCost"] = function(v) return v * 0.6 end } }
+	--2t5 mdd proc
+	self.PlayerAura[GetSpellInfo(308009)] =  { ActiveAura = "T5x2M", Spells = 51505, ID = 308009 }
+	--2t5 rdd proc
+	self.PlayerAura[GetSpellInfo(307999)] =  { ActiveAura = "T5x2R", Spells = 51505, ID = 307999 } --- lava
+	---2t5 rdd proc
+	self.PlayerAura[GetSpellInfo(307999)] =  { ActiveAura = "T5x2R", Spells = 8042, ID = 307999 } ----earth
+	--4t5 rdd proc
+	self.PlayerAura[GetSpellInfo(309228)] =  { ActiveAura = "T5x4R", Spells = 51505, ID = 309228 }
 --Target
 	--Riptide
 	self.TargetAura[GetSpellInfo(61295)] = { Spells = 1064, Value = 0.25, ID = 61295 }
+
+	self.TargetAura[GetSpellInfo(308004)] = {  ActiveAura = "T5x2RTD", Spells = 8042, ID = 308004 }
 	--Flame Shock
 	self.TargetAura[GetSpellInfo(8050)] = { ActiveAura = "Flame Shock", Spells = 51505, ID = 8050 }
 	--Frostbrand Attack
@@ -719,6 +770,20 @@ function DrDamage:PlayerData()
 			["Name"] = "Lava Lash",
 			[0] = { School = "Fire", Melee = true, Cooldown = 6, OffhandAttack = true, WeaponDamage = 1, NoNormalization = true },
 			[1] = { 0 },
+		},
+		[GetSpellInfo(309084)] = {
+			--DONE: BASE OK, INCREASE OK, COEFFICIENT OK
+			["Name"] = "Volcano Totem",
+			[0] = { School = { "Fire", "OffensiveTotem" }, eDuration = 36, sHits = 12, canCrit = true},
+			-- [0] = { School = "Fire", Melee = true, Cooldown = 6, OffhandAttack = true, WeaponDamage = 1, NoNormalization = true },
+			[1] = { 1980, 1980, 0, 0, spellLevel = 80 },
+		},
+		[GetSpellInfo(309231)] = {
+			--DONE: BASE OK, INCREASE OK, COEFFICIENT OK
+			["Name"] = "Earthquake",
+			[0] = { School =  "Nature",  SPBonus = 3.446, castTime = 10, sHits = 5, BaseIncrease = true ,canCrit = true, Channeled = true, AoE = true,},
+			-- [0] = { School = "Fire", Melee = true, Cooldown = 6, OffhandAttack = true, WeaponDamage = 1, NoNormalization = true },
+			[1] = { 10622, 10622, 0, 0, spellLevel = 80 }, --TODO
 		},
 	}
 	self.talentInfo = {

@@ -18,7 +18,6 @@ local UnitCreatureType = UnitCreatureType
 --NOTE: One-Handed Weapon Specialization is handled by API (7th return of UnitDamage("player"), Two-Handed Weapon Specialization is multiplied into weapon damage range
 
 function DrDamage:PlayerData()
-	local horde = (UnitFactionGroup("player") == "Horde")
 	--Lay on Hands
 	self.ClassSpecials[GetSpellInfo(633)] = function()
 		return UnitHealthMax("player"), true
@@ -73,6 +72,10 @@ function DrDamage:PlayerData()
 				end
 				if self:GetSetAmount( "PvP Retri" ) >= 4 then
 					calculation.cooldown = calculation.cooldown - 1
+				end
+				if self:GetSetAmount( "T5 Retribution" ) >= 4 then
+					calculation.cooldown = calculation.cooldown - 2
+					calculation.dmgM_Add = calculation.dmgM_Add + 0.2
 				end
 				if self:GetSetAmount( "T9 Retribution" ) >= 4 then
 					calculation.critPerc = calculation.critPerc + 5
@@ -296,43 +299,40 @@ function DrDamage:PlayerData()
 		calculation.APBonus = spd * 0.022
 		calculation.SPBonus = spd * 0.044
 	end
-	if horde then
-		local bc = "|T" .. select(3,GetSpellInfo(53742)) .. ":16:16:1:-1|t"
-		self.Calculation["Seal of Corruption"] = function( calculation, ActiveAuras )
-			local number = ActiveAuras["Blood Corruption"] or 1
-			calculation.extraDamage = number * 0.125
-			calculation.extraDamageSP = number * 0.065
-			calculation.extraName = number .. "x" .. bc
-			calculation.WeaponDamage = math_min(1,((ActiveAuras["Blood Corruption"] or 0)/5)) * 0.33
-			calculation.WeaponDPS = true
-			if self:GetSetAmount( "T8 Protection" ) >= 2 then
-				--TODO: A/M?
-				calculation.dmgM_Add = calculation.dmgM_Add + 0.1
-			end
+	local bc = "|T" .. select(3,GetSpellInfo(53742)) .. ":16:16:1:-1|t"
+	self.Calculation["Seal of Corruption"] = function( calculation, ActiveAuras )
+		local number = ActiveAuras["Blood Corruption"] or 1
+		calculation.extraDamage = number * 0.125
+		calculation.extraDamageSP = number * 0.065
+		calculation.extraName = number .. "x" .. bc
+		calculation.WeaponDamage = math_min(1,((ActiveAuras["Blood Corruption"] or 0)/5)) * 0.33
+		calculation.WeaponDPS = true
+		if self:GetSetAmount( "T8 Protection" ) >= 2 then
+			--TODO: A/M?
+			calculation.dmgM_Add = calculation.dmgM_Add + 0.1
 		end
-		self.Calculation["Judgement of Corruption"] = function( calculation, ActiveAuras )
-			if ActiveAuras["Blood Corruption"] then
-				calculation.dmgM = calculation.dmgM * (1 + 0.1 * ActiveAuras["Blood Corruption"])
-			end
+	end
+	self.Calculation["Judgement of Corruption"] = function( calculation, ActiveAuras )
+		if ActiveAuras["Blood Corruption"] then
+			calculation.dmgM = calculation.dmgM * (1 + 0.1 * ActiveAuras["Blood Corruption"])
 		end
-	else
-		local hv = "|T" .. select(3,GetSpellInfo(31803)) .. ":16:16:1:-1|t"
-		self.Calculation["Seal of Vengeance"] = function( calculation, ActiveAuras )
-			local number = ActiveAuras["Holy Vengeance"] or 1
-			calculation.extraDamage = number * 0.125
-			calculation.extraDamageSP = number * 0.065
-			calculation.extraName = number .. "x" .. hv
-			calculation.WeaponDamage = math_min(1,((ActiveAuras["Holy Vengeance"] or 0)/5)) * 0.33
-			calculation.WeaponDPS = true
-			if self:GetSetAmount( "T8 Protection" ) >= 2 then
-				--TODO: A/M?
-				calculation.dmgM_Add = calculation.dmgM_Add + 0.1
-			end
+	end
+	local hv = "|T" .. select(3,GetSpellInfo(31803)) .. ":16:16:1:-1|t"
+	self.Calculation["Seal of Vengeance"] = function( calculation, ActiveAuras )
+		local number = ActiveAuras["Holy Vengeance"] or 1
+		calculation.extraDamage = number * 0.125
+		calculation.extraDamageSP = number * 0.065
+		calculation.extraName = number .. "x" .. hv
+		calculation.WeaponDamage = math_min(1,((ActiveAuras["Holy Vengeance"] or 0)/5)) * 0.33
+		calculation.WeaponDPS = true
+		if self:GetSetAmount( "T8 Protection" ) >= 2 then
+			--TODO: A/M?
+			calculation.dmgM_Add = calculation.dmgM_Add + 0.1
 		end
-		self.Calculation["Judgement of Vengeance"] = function( calculation, ActiveAuras )
-			if ActiveAuras["Holy Vengeance"] then
-				calculation.dmgM = calculation.dmgM * (1 + 0.1 * ActiveAuras["Holy Vengeance"])
-			end
+	end
+	self.Calculation["Judgement of Vengeance"] = function( calculation, ActiveAuras )
+		if ActiveAuras["Holy Vengeance"] then
+			calculation.dmgM = calculation.dmgM * (1 + 0.1 * ActiveAuras["Holy Vengeance"])
 		end
 	end
 --RELICS
@@ -400,6 +400,11 @@ function DrDamage:PlayerData()
 		--Wrathful Gladiator's
 		51474, 51475, 51476, 51477, 51479,
 	}
+	--T4
+	self.SetBonuses["T4 Holy"] = { 29061, 29062, 29063, 29064, 29065, 100445, 100446, 100447, 100448, 100449 }
+	--T5
+	self.SetBonuses["T5 Holy"] = { 30138, 30137, 30134, 30135, 30136, 103428, 103426, 103427, 103429, 103430 }
+    self.SetBonuses["T5 Retribution"] = { 30129, 30130, 30132, 103422, 103421, 30133, 30131, 103424, 103423, 103425 }
 	--T7
 	self.SetBonuses["T7 Holy"] = { 39628, 39629, 39630, 39631, 39632, 40569, 40570, 40571, 40572, 40573 }
 	self.SetBonuses["T7 Protection"] = { 39638, 39639, 39640, 39641, 39642, 40579, 40580, 40581, 40583, 40584 }
@@ -437,7 +442,17 @@ function DrDamage:PlayerData()
 	--Light's Grace
 	self.PlayerAura[GetSpellInfo(31834)] = { Update = true, Spells = 635 }
 	--Divine Illumination
-	self.PlayerAura[GetSpellInfo(31842)] = { ActiveAura = "Divine Illumination", ID = 31842 }	
+	self.PlayerAura[GetSpellInfo(31842)] = { ActiveAura = "Divine Illumination", ID = 31842 }
+	--T4 Holy
+	self.PlayerAura[GetSpellInfo(304704)] = { Spells = 20473, Value = 0.33 , ID = 304704 }
+	self.PlayerAura[GetSpellInfo(304702)] = { Spells = 19750, Value = 0.16 , ID = 304702 }
+	--T5 Retribution Procs
+	self.PlayerAura[GetSpellInfo(307928)] = { Spells = 35395, ModType = "dmgM_Add", Value = 3, ID = 307928 }
+    self.PlayerAura[GetSpellInfo(307927)] = { Spells = 24275, ModType = "dmgM_Add", Value = 1.5, ID = 307927 }
+    self.PlayerAura[GetSpellInfo(307926)] = { Spells = 879, ModType = "dmgM_Add", Value = 2.4, ID = 307926, Mods = { function(calculation) calculation.hitPerc = 100 end } }
+	--T5 Holy
+	self.PlayerAura[GetSpellInfo(307910)] = { Spells = 19750, ModType = "critPerc", Value = 9, Apps = 6 , ID = 307910 }
+	self.PlayerAura[GetSpellInfo(307911)] = { Spells = 20473, Value = 0.25, ID = 307911 }	
 	--Divine Favor
 	self.PlayerAura[GetSpellInfo(20216)] = { Spells = { 19750, 635, 20473 }, ModType = "critPerc", Value = 100, ID = 20216 }
 	--Infusion of Light
@@ -452,9 +467,9 @@ function DrDamage:PlayerData()
 	self.PlayerAura[GetSpellInfo(70757)] = { Spells = 635, Update = true }
 --Target
 	--Blood Corruption
-	if horde then self.TargetAura[GetSpellInfo(53742)] = { Spells = { 53736, ["Judgement of Corruption"] = true }, ActiveAura = "Blood Corruption", SelfCast = true, Apps = 5, ID = 53742 }
+	self.TargetAura[GetSpellInfo(53742)] = { Spells = { 53736, ["Judgement of Corruption"] = true }, ActiveAura = "Blood Corruption", SelfCast = true, Apps = 5, ID = 53742 }
 	--Holy Vengeance
-	else self.TargetAura[GetSpellInfo(31803)] = { Spells = { 31801, ["Judgement of Vengeance"] = true }, ActiveAura = "Holy Vengeance", SelfCast = true, Apps = 5, ID = 31803 } end
+	self.TargetAura[GetSpellInfo(31803)] = { Spells = { 31801, ["Judgement of Vengeance"] = true }, ActiveAura = "Holy Vengeance", SelfCast = true, Apps = 5, ID = 31803 }
 --Auras
 	--Concentration
 	self.TargetAura[GetSpellInfo(19746)] = 	{ School = "Healing", ActiveAura = "Improved Devotion Aura", SelfCastBuff = true, Manual = GetSpellInfo(20140), Category = "+6% Healing", SkipCategory = true, ID = 20140 }
@@ -470,6 +485,9 @@ function DrDamage:PlayerData()
 	self.TargetAura[GetSpellInfo(19876)] = 	self.TargetAura[GetSpellInfo(19746)]
 	--Retribution
 	self.TargetAura[GetSpellInfo(7294)] = 	self.TargetAura[GetSpellInfo(19746)]
+	--4T5 Retribution Abilities
+	self.TargetAura[GetSpellInfo(307934)] = { Value = 0.12, ID = 307934 }
+	self.PlayerAura[GetSpellInfo(307935)] = { Spells = 307935, ID = 307935 , Value = 0.2 , Apps = 6 }
 --Custom
 	--Seal of Light
 	self.PlayerAura[GetSpellInfo(20165)] = { Caster = true, School = "Healing", ID = 20165, Not = { "Gift of the Naaru", "Lifeblood" }, ModType =
@@ -531,6 +549,16 @@ function DrDamage:PlayerData()
 					[4] = { 733, 809, 14, 14, spellLevel = 68, },
 					[5] = { 878, 970, 16, 16, spellLevel = 74, },
 					[6] = { 1139, 1257, 0, 0, spellLevel = 80, },
+		},
+		[GetSpellInfo(307935)] = {
+			["Name"] = "Опаляющий свет",
+			[0] = { School = "Holy", eDot = true, Melee = true, Cooldown = 54, NoCrits = true, APBonus = 0.36, sTicks = 2, eDuration = 24, AoE = true, Unavoidable = true},
+			[1] = { 2000, 2000, },
+		},
+		[GetSpellInfo(307934)] = {
+					["Name"] = "Печать инквизитора",
+					[0] = { School = "Holy", Melee = true, Cooldown = 54, NoCrits = true, APBonus = 10, Unavoidable = true },
+					[1] = { 0, 0, },
 		},
 		[GetSpellInfo(20925)] = {
 					--DONE: BASE OK, INCREASE OK, COEFFICIENT OK, DOWNRANK OK
@@ -758,33 +786,30 @@ function DrDamage:PlayerData()
 	}
 	self.spellInfo[GetSpellInfo(53408)] = self.spellInfo[GetSpellInfo(20271)]
 	self.spellInfo[GetSpellInfo(53407)] = self.spellInfo[GetSpellInfo(20271)]
-	if horde then
-		self.spellInfo[GetSpellInfo(53736)] = {
-					["Name"] = "Seal of Corruption",
-					[0] = { School = { "Holy", "Seal" }, Melee = true, SPBonus = 0, E_eDuration = 15, E_Ticks = 3, NoDPM = true, Unavoidable = true, NoNormalization = true },
-					[1] = { 0, 0, },
-		}
-		self.spellInfo["Judgement of Corruption"] = {
-					["Name"] = "Judgement of Corruption",
-					["Text1"] = GetSpellInfo(10321),
-					["Text2"] = GetSpellInfo(53736),
-					[0] = { School = { "Holy", "Judgement" }, Melee = true, SPBonus = 0.22, APBonus = 0.14, Cooldown = 10, Unavoidable = true },
-					[1] = { 1, 1 },
-		}
-	else
-		self.spellInfo[GetSpellInfo(31801)] = {
-					["Name"] = "Seal of Vengeance",
-					[0] = { School = { "Holy", "Seal" }, Melee = true, SPBonus = 0, E_eDuration = 15, E_Ticks = 3, NoDPM = true, Unavoidable = true, NoNormalization = true },
-					[1] = { 0, 0 },
-		}
-		self.spellInfo["Judgement of Vengeance"] = {
-					["Name"] = "Judgement of Vengeance",
-					["Text1"] = GetSpellInfo(10321),
-					["Text2"] = GetSpellInfo(31801),
-					[0] = { School = { "Holy", "Judgement" }, Melee = true, SPBonus = 0.22, APBonus = 0.14, Cooldown = 10, Unavoidable = true },
-					[1] = { 1, 1 },
-		}
-	end
+	self.spellInfo[GetSpellInfo(53736)] = {
+				["Name"] = "Seal of Corruption",
+				[0] = { School = { "Holy", "Seal" }, Melee = true, SPBonus = 0, E_eDuration = 15, E_Ticks = 3, NoDPM = true, Unavoidable = true, NoNormalization = true },
+				[1] = { 0, 0, },
+	}
+	self.spellInfo["Judgement of Corruption"] = {
+				["Name"] = "Judgement of Corruption",
+				["Text1"] = GetSpellInfo(10321),
+				["Text2"] = GetSpellInfo(53736),
+				[0] = { School = { "Holy", "Judgement" }, Melee = true, SPBonus = 0.22, APBonus = 0.14, Cooldown = 10, Unavoidable = true },
+				[1] = { 1, 1 },
+	}
+	self.spellInfo[GetSpellInfo(31801)] = {
+				["Name"] = "Seal of Vengeance",
+				[0] = { School = { "Holy", "Seal" }, Melee = true, SPBonus = 0, E_eDuration = 15, E_Ticks = 3, NoDPM = true, Unavoidable = true, NoNormalization = true },
+				[1] = { 0, 0 },
+	}
+	self.spellInfo["Judgement of Vengeance"] = {
+				["Name"] = "Judgement of Vengeance",
+				["Text1"] = GetSpellInfo(10321),
+				["Text2"] = GetSpellInfo(31801),
+				[0] = { School = { "Holy", "Judgement" }, Melee = true, SPBonus = 0.22, APBonus = 0.14, Cooldown = 10, Unavoidable = true },
+				[1] = { 1, 1 },
+	}
 	self.talentInfo = {
 	--HOLY:
 		--Seals of the Pure (additive except multiplicative on SoR - 3.3.3)
