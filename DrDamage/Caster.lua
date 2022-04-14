@@ -656,7 +656,7 @@ DrD_DmgCalc = function( baseSpell, spell, nextCalc, hitCalc, tooltip )
 
 	--CORE: Basic min/max calculation
 	local calcMinDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.minDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod + calculation.dopProcsDmg --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
-	local calcMaxDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.maxDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod + (calculation.dopProcsDmg* calculation.spellCrit ) --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
+	local calcMaxDmg = calculation.dmgM_dd * calculation.dmgM * (calculation.bDmgM * calculation.maxDam * (calculation.sHits or 1) + (modHits * ((calculation.spellDmg + calculation.spellDmg_dd) * calculation.spellDmgM + calculation.AP * calculation.APBonus))) + calculation.finalMod + calculation.dopProcsDmg --+ calculation.finalMod_fM * calculation.dmgM --+ calculation.finalMod_sM * calculation.spellDmgM
 	local calcDotDmg = 0
 
 	--CORE: Effects extended by talents. (Imp. SW:P etc.)

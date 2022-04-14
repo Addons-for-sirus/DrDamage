@@ -268,11 +268,12 @@ function DrDamage:PlayerData()
 	end
 
 	self.Calculation["Lava Burst"] = function( calculation, ActiveAuras )
-		--Glyph of Lava (additive - 3.3.3)
+
 		local bonusR2 = (ActiveAuras["T5x2R"] and math_min(30, ActiveAuras["T5x2R"] + 1) or 0) * 0.05
 		local bonusR4 = (ActiveAuras["T5x4R"] and math_min(30, ActiveAuras["T5x4R"] + 1) or 0) * 0.02
 		local bonusM = (ActiveAuras["T5x2M"] and math_min(2, ActiveAuras["T5x2M"] + 1) or 0) * 0.5
 		-- print(bonus)
+		--Glyph of Lava (additive - 3.3.3)
 		if self:HasGlyph(55454) then
 			calculation.spellDmgM = calculation.spellDmgM + 0.1
 		end
@@ -362,14 +363,14 @@ function DrDamage:PlayerData()
 	end
 	-- self.Calculation["Earth Shock"] = self.Calculation["Frost Shock"]
 	self.Calculation["Earth Shock"] = function( calculation ,ActiveAuras )
-		local spellDmg = GetSpellBonusDamage(4) * 2.2 --- todo 2.2 is coof of spd to stone spike
-		local bonusR2 = (ActiveAuras["T5x2R"] and ((math_min(10, ActiveAuras["T5x2R"] + 1) or 1)/2) * (spellDmg or 0))
-		local bunusR2TD  = (ActiveAuras["T5x2RTD"] and ((math_min(5, ActiveAuras["T5x2RTD"] + 1) or 1)* 0.2)) or 0
+		-- local spellDmg = GetSpellBonusDamage(4) * 2.2 --- todo 2.2 is coof of spd to stone spike
+		-- local bonusR2 = (ActiveAuras["T5x2R"] and ((math_min(10, ActiveAuras["T5x2R"] + 1) or 1)/2) * (spellDmg or 0))
+		-- local bunusR2TD  = (ActiveAuras["T5x2RTD"] and ((math_min(5, ActiveAuras["T5x2RTD"] + 1) or 1)* 0.2)) or 0
 		-- print(bonusR2)
 		-- local bonusR2N = (ActiveAuras["T5x2RN"] and (math_min(5, ActiveAuras["T5x2RN"] + 1) or 1)/2) * 0.2
-		if ActiveAuras["T5x2R"] then
-			calculation.dopProcsDmg = (calculation.dopProcsDmg or 0) + (bonusR2 + ((bunusR2TD and bonusR2 * bunusR2TD) or 0))  ----------- thants +- dmg
-		end
+		-- if ActiveAuras["T5x2R"] then
+			-- calculation.dopProcsDmg = (bonusR2 + ((bunusR2TD and bonusR2 * bunusR2TD) or 0))  ----------- thants +- dmg
+		-- end
 
 		if self:HasGlyph(55442) then
 			calculation.castTime = 1
@@ -774,7 +775,7 @@ function DrDamage:PlayerData()
 		[GetSpellInfo(309084)] = {
 			--DONE: BASE OK, INCREASE OK, COEFFICIENT OK
 			["Name"] = "Volcano Totem",
-			[0] = { School = { "Fire", "OffensiveTotem" }, eDuration = 36, sHits = 12, canCrit = true},
+			[0] = { School = { "Fire", "OffensiveTotem" }, eDuration = 36, sHits = 12, canCrit = false},
 			-- [0] = { School = "Fire", Melee = true, Cooldown = 6, OffhandAttack = true, WeaponDamage = 1, NoNormalization = true },
 			[1] = { 1980, 1980, 0, 0, spellLevel = 80 },
 		},

@@ -51,6 +51,7 @@ local function DrD_LoadAuras()
 	end
 	----eredar 5%
 	Aura[GetSpellInfo(316466)] = { School = "All", ID = 316466,  Multiply = true, Mods = { ["dmgM"] = 0.05 } }
+	----eredar 2%
 	Aura[GetSpellInfo(316463)] = { School = "All", ID = 316463,  Multiply = true, Mods = { ["dmgM"] = 0.02 } }
 	--Ferocious Inspiration
 	Aura[GetSpellInfo(34455)] = { Category = "+3% damage", Not = { "Absorb", "Utility", "Pet" }, Manual = GetSpellInfo(34455), ID = 34455, Multiply = true, Mods = { ["dmgM"] = 0.03 } }
