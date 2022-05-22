@@ -388,8 +388,13 @@ function DrDamage:PlayerData()
 	end
 	self.Calculation["Lesser Healing Wave"] = function( calculation, ActiveAuras )
 		--Glyph of Lesser Healing Wave (additive/multiplicative - unknown since Purification is multiplicative)
+		local bonusH4 = (ActiveAuras["T5x4H"] and math_min(6, ActiveAuras["T5x4H"] + 1) or 0) * 0.5
+		-- if bonusH4
 		if self:HasGlyph(55438) and ActiveAuras["Earth Shield"] then
 			calculation.dmgM = calculation.dmgM * 1.2
+		end
+		if ActiveAuras["T5x4H"] then
+			calculation.critM = calculation.critM + bonusH4
 		end
 	end
 	self.Calculation["Lightning Bolt"] = function( calculation )
@@ -462,6 +467,7 @@ function DrDamage:PlayerData()
 	self.SetBonuses["T10 Healer"] = { 50836, 50837, 50838, 50839, 50835, 51248, 51191, 51247, 51192, 51246, 51193, 51245, 51194, 51249, 51190 }
 	self.SetBonuses["T5 Melee"] = { 30189, 30192, 30190, 30194, 30185 ,103463,103465,103461,103462,103464,151657,151659,151655,151656,151658} --TODO
 	self.SetBonuses["T5 Elemental"] = { 30170, 30172, 30171, 30173, 30169 ,103458,103460,103458,103456,103457,103459,151652,151654,151650,151651,151653} --TODO
+	self.SetBonuses["T5 Heal"] = { 30165,30167,30166,30168,30164} --TODO
 --RELIC
 	--Steamcaller's Totem, Totem of Healing Rains, Totem of the Bay
 	self.RelicSlot["Chain Heal"] = { 45114, 243, 28523, 87, 38368, 102, ModType1 = "Base", ModType2 = "Base", ModType3 = "Base" }
@@ -507,6 +513,8 @@ function DrDamage:PlayerData()
 	self.PlayerAura[GetSpellInfo(307999)] =  { ActiveAura = "T5x2R", Spells = 8042, ID = 307999 } ----earth
 	--4t5 rdd proc
 	self.PlayerAura[GetSpellInfo(309228)] =  { ActiveAura = "T5x4R", Spells = 51505, ID = 309228 }
+
+	self.PlayerAura[GetSpellInfo(308015)] =  { ActiveAura = "T5x4H", Spells = 49276, ID = 308015 } -- heal crit
 --Target
 	--Riptide
 	self.TargetAura[GetSpellInfo(61295)] = { Spells = 1064, Value = 0.25, ID = 61295 }
@@ -785,6 +793,12 @@ function DrDamage:PlayerData()
 			[0] = { School =  "Nature",  SPBonus = 3.446, castTime = 10, sHits = 5, BaseIncrease = true ,canCrit = true, Channeled = true, AoE = true,},
 			-- [0] = { School = "Fire", Melee = true, Cooldown = 6, OffhandAttack = true, WeaponDamage = 1, NoNormalization = true },
 			[1] = { 10622, 10622, 0, 0, spellLevel = 80 }, --TODO
+		},
+		[GetSpellInfo(308017)] = {
+			--DONE: BASE OK, INCREASE OK, COEFFICIENT OK, DOWNRANK OK
+			["Name"] = "Healing Rain",
+			[0] = { School = { "Nature", "Healing", }, SPBonus = 1, eDot = true, eDuration = 6, sHits = 6, AoE = 6, NoPeriod = true, NoDownrank = true },
+			[1] = { 2000, 2000, spellLevel = 80, },
 		},
 	}
 	self.talentInfo = {
